@@ -1,23 +1,13 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
-import { NgxPaginationModule } from 'ngx-pagination';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { MoviesService } from '../../services/movies.service';
 import { Movie } from '../../models/movie.model';
-import { ContainerComponent } from '../../share/container/container.component';
-import { CustomPaginationComponent } from '../../components/custom-pagination/custom-pagination.component';
+import { MoviesContextService } from '../../services/movies-context.service';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [
-    NgFor,
-    NgIf,
-    ContainerComponent,
-    NgxPaginationModule,
-    CustomPaginationComponent,
-  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -25,33 +15,43 @@ export class HomeComponent implements OnInit {
   movies: Movie[] = [];
   isFetching = false;
   error = '';
-  p: number = 1;
+  page: number = 1;
   totalItems: number = 1160;
 
+  private router = inject(Router);
   private moviesService = inject(MoviesService);
   private destroyRef = inject(DestroyRef);
-  private router = inject(Router);
+  private moviesContext = inject(MoviesContextService);
 
   ngOnInit(): void {
-    this.fetchMovies(this.p);
+    this.page = this.moviesContext.getPage();
+    this.fetchMovies(this.page);
+    this.moviesContext.setContext('home');
   }
 
   fetchMovies(page: number): void {
     this.isFetching = true;
-    const subscription = this.moviesService.getMovies(page).subscribe({
-      next: (data) => {
-        this.movies = data;
-      },
-      error: (err: Error) => (this.error = err.message),
-      complete: () => (this.isFetching = false),
-    });
+    const subscription = this.moviesService
+      .getMovies(page)
+      .pipe(
+        finalize(() => {
+          this.isFetching = false;
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          this.movies = data;
+        },
+        error: (err: Error) => (this.error = err.message),
+      });
 
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   pageChanged(page: number): void {
     this.movies = [];
-    this.p = page;
+    this.page = page;
+    this.moviesContext.setPage(page);
     this.fetchMovies(page);
   }
 

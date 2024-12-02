@@ -1,12 +1,25 @@
 import { Routes } from '@angular/router';
 
 import { HomeComponent } from './pages/home/home.component';
-import { MovieDetailsComponent } from './pages/movie-details/movie-details.component';
-import { FavoriteListComponent } from './pages/favorite-list/favorite-list.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Home' },
-  { path: 'movie/:id', component: MovieDetailsComponent, title: 'Movie' },
-  { path: 'favorite', component: FavoriteListComponent, title: 'My favorite' },
-  { path: '**', redirectTo: '' }
+  {
+    path: 'movie/:id',
+    loadChildren: () =>
+      import('./pages/movie-details/movie-details.module').then(
+        (m) => m.MovieDetailsModule
+      ),
+    title: 'Movie',
+  },
+  {
+    path: 'favorite',
+    loadChildren: () =>
+      import('./pages/favorite-list/favorite.module').then(
+        (m) => m.FavoriteModule
+      ),
+    title: 'My favorite',
+  },
+
+  { path: '**', redirectTo: '' },
 ];

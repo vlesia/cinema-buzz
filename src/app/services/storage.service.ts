@@ -13,7 +13,7 @@ export class StorageService {
     const movieIndex = movies.findIndex((m) => m.id === movie.id);
 
     if (movieIndex === -1) {
-      movies.unshift(movie);
+      movies.push(movie);
     } else {
       movies.splice(movieIndex, 1);
     }

@@ -1,16 +1,14 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs';
 
 import { MoviesService } from '../../services/movies.service';
 import { Movie } from '../../models/movie.model';
-import { ButtonComponent } from '../../share/button/button.component';
 import { StorageService } from '../../services/storage.service';
+import { MoviesContextService } from '../../services/movies-context.service';
 
 @Component({
   selector: 'app-movie-details',
-  standalone: true,
-  imports: [CommonModule, ButtonComponent],
   templateUrl: './movie-details.component.html',
   styleUrl: './movie-details.component.scss',
 })
@@ -20,13 +18,15 @@ export class MovieDetailsComponent implements OnInit {
   error = '';
   isFetching = false;
   movies: Movie[] = [];
-  isAddedToFavorite = false;
+  moviesFavorite: Movie[] = [];
+  context = '';
 
   private activatedRoute = inject(ActivatedRoute);
-  private moviesService = inject(MoviesService);
-  private storageService = inject(StorageService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private moviesService = inject(MoviesService);
+  private storageService = inject(StorageService);
+  private moviesContext = inject(MoviesContextService);
 
   get posterUrl(): string {
     return `https://image.tmdb.org/t/p/w342${this.movie?.poster_path}`;
@@ -37,84 +37,105 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.movies = this.storageService.getMovies();
+    this.initializeContext();
     this.movieId = +this.activatedRoute.snapshot.params['id'];
+    this.fetchMovie(this.movieId);
+  }
+
+  get isLastMovie(): boolean {
+    return this.movies[this.movies.length - 1]?.id === this.movie?.id;
+  }
+
+  get isFirstMovie(): boolean {
+    return this.movies[0]?.id === this.movie?.id;
+  }
+
+  get isMovieInFavorite(): boolean {
+    return this.moviesFavorite.some((movie) => movie.id === this.movie?.id);
+  }
+
+  get showNextButton(): boolean {
+    return this.movies.length > 1;
+  }
+
+  get showBackButton(): boolean {
+    return this.movies.length < 1 || this.isFirstMovie;
+  }
+
+  getNextMovie(): void {
+    if (this.isLastMovie) {
+      this.redirectToContext();
+      return;
+    }
+
+    const nextMovieId = this.getRelativeMovieId(1);
+    if (nextMovieId) {
+      this.router.navigate(['/movie', nextMovieId]);
+      this.fetchMovie(nextMovieId);
+    }
+  }
+
+  getPreviousMovie(): void {
+    if (this.movies.length === 0 || this.isFirstMovie) {
+      this.redirectToContext();
+      return;
+    }
+
+    const previousMovieId = this.getRelativeMovieId(-1);
+    if (previousMovieId) {
+      this.router.navigate(['/movie', previousMovieId]);
+      this.fetchMovie(previousMovieId);
+    }
+  }
+
+  addToFavorite(): void {
+    if (this.movie) this.storageService.addOrRemoveMovie(this.movie);
+    this.moviesFavorite = this.storageService.getMovies();
+  }
+
+  private getRelativeMovieId(offset: number): number | null {
+    const currentIndex = this.movies.findIndex(
+      (movie) => movie.id === this.movie?.id
+    );
+
+    const newIndex = currentIndex + offset;
+    if (newIndex >= 0 && newIndex < this.movies.length) {
+      return this.movies[newIndex].id;
+    }
+    return null;
+  }
+
+  private initializeContext(): void {
+    this.moviesFavorite = this.storageService.getMovies();
+    this.context = this.moviesContext.getContext();
+
+    this.movies =
+      this.context === 'home' ? this.moviesService.movies : this.moviesFavorite;
+  }
+
+  private fetchMovie(movieId: number): void {
     this.isFetching = true;
     const subscription = this.moviesService
-      .getMovieById(this.movieId)
+      .getMovieById(movieId)
+      .pipe(
+        finalize(() => {
+          this.isFetching = false;
+        })
+      )
       .subscribe({
-        next: (val) => {
-         this.movie = val;
-          this.error = '';
+        next: (movie) => {
+          this.movie = movie;
         },
         error: (err: Error) => {
           this.error = err.message;
-          this.movie = null as any;
         },
-
-        complete: () => (this.isFetching = false),
       });
 
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
-  get isLastMovie(): boolean {
-    return this.movies[this.movies.length - 1].id === this.movie?.id;
-  }
-  get isFirstMovie(): boolean {
-    return this.movies[0]?.id === this.movie?.id;
-  }
-
-  get isMovieInList(): boolean {
-    return this.movies.some((movie) => movie.id === this.movie?.id);
-  }
-
-  get showNextButton(): boolean {
-    return this.movies.length > 1 && this.isMovieInList;
-  }
-
-  get showBackButton(): boolean {
-    return this.movies.length < 1 || this.isFirstMovie || !this.isMovieInList;
-  }
-
-  getNextMovie(): void {
-    if (this.isLastMovie) {
-      this.router.navigate(['']);
-    } else {
-      const currentIndex = this.movies.findIndex(
-        (movie) => movie.id === this.movie?.id
-      );
-
-      if (currentIndex === -1 || currentIndex >= this.movies.length - 1) {
-        return;
-      }
-
-      const nextMovie = this.movies[currentIndex + 1];
-      this.router.navigate(['/movie', nextMovie.id]);
-      this.movie = nextMovie;
-    }
-  }
-
-  getPreviousMovie(): void {
-    if (this.isFirstMovie || !this.isMovieInList) {
-      this.router.navigate(['']);
-    } else {
-      const currentIndex = this.movies.findIndex(
-        (movie) => movie.id === this.movie?.id
-      );
-
-      if (currentIndex === 0 || currentIndex === -1) {
-        return;
-      }
-
-      const previousMovie = this.movies[currentIndex - 1];
-      this.router.navigate(['/movie', previousMovie.id]);
-      this.movie = previousMovie;
-    }
-  }
-
-  addToFavorite() {
-    if (this.movie) this.storageService.addOrRemoveMovie(this.movie);
-    this.movies = this.storageService.getMovies();
+  private redirectToContext(): void {
+    const route = this.context === 'home' ? '' : 'favorite';
+    this.router.navigate([route]);
   }
 }

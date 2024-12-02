@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -7,20 +6,16 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-custom-pagination',
-  standalone: true,
-  imports: [NgxPaginationModule, NgFor, NgIf],
   templateUrl: './custom-pagination.component.html',
   styleUrl: './custom-pagination.component.scss',
 })
 export class CustomPaginationComponent implements OnInit {
   isSmallScreen: boolean = false;
 
-  @Input() id: string = '';
-  @Input() maxSize: number = 2;
+  @Input() maxSize: number = 1;
   @Input() itemsPerPage: number = 20;
   @Input() totalItems: number = 1160;
   @Input() currentPage: number = 1;
@@ -37,10 +32,6 @@ export class CustomPaginationComponent implements OnInit {
     this.updateScreenSize();
   }
 
-  private updateScreenSize(): void {
-    this.isSmallScreen = window.innerWidth < 576;
-  }
-
   get totalPages(): number {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
@@ -49,34 +40,21 @@ export class CustomPaginationComponent implements OnInit {
     if (this.isSmallScreen) {
       return [{ value: this.currentPage, label: this.currentPage.toString() }];
     }
+
     const pages = [];
-    let visiblePageCount = this.currentPage + this.maxSize;
-    let visiblePageCountReversed = this.currentPage - this.maxSize;
-    if (this.currentPage === this.totalPages) {
-      pages.unshift({
-        value: this.currentPage,
-        label: this.currentPage.toString(),
-      });
-      pages.unshift({
-        value: this.currentPage - 1,
-        label: (this.currentPage - 1).toString(),
-      });
-    } else if (this.currentPage >= 50) {
-      for (let i = this.currentPage; i >= visiblePageCountReversed; i--) {
-        pages.unshift({ value: i, label: i.toString() });
-        if (visiblePageCountReversed === i) {
-          pages.unshift({ value: i - 3, label: '...' });
-        }
-      }
-    } else {
-      for (let i = this.currentPage; i <= visiblePageCount; i++) {
-        pages.push({ value: i, label: i.toString() });
-        if (visiblePageCount === i) {
-          pages.push({ value: i + 3, label: '...' });
-        }
-      }
+    const startPage = Math.max(1, this.currentPage - this.maxSize);
+    const endPage = Math.min(this.totalPages, this.currentPage + this.maxSize);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push({ value: i, label: i.toString() });
     }
 
+    if (startPage > 1) {
+      pages.unshift({ value: startPage - 1, label: '...' });
+    }
+    if (endPage < this.totalPages) {
+      pages.push({ value: endPage + 1, label: '...' });
+    }
     return pages;
   }
 
@@ -119,5 +97,9 @@ export class CustomPaginationComponent implements OnInit {
       this.currentPage = this.totalPages;
       this.pageChange.emit(this.currentPage);
     }
+  }
+
+  private updateScreenSize(): void {
+    this.isSmallScreen = window.innerWidth < 576;
   }
 }

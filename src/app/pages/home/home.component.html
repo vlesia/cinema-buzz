@@ -8,15 +8,7 @@
 
   <div *ngIf="movies.length > 0" class="movies-grid">
     <div
-      *ngFor="
-        let movie of movies
-          | paginate
-            : {
-                itemsPerPage: 20,
-                currentPage: p,
-                totalItems: totalItems
-              }
-      "
+      *ngFor="let movie of movies"
       class="movies"
       (click)="navigateToMovieDetails(movie.id)"
     >
@@ -29,6 +21,9 @@
   </div>
   <app-custom-pagination
     [style.display]="movies.length > 0 ? 'block' : 'none'"
+    [currentPage]="page"
+    [totalItems]="totalItems"
+    [itemsPerPage]="20"
     (pageChange)="pageChanged($event)"
     (pageBoundsCorrection)="pageChanged($event)"
     firstLabel="First"

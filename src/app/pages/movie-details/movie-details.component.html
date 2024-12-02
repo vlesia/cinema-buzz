@@ -9,7 +9,7 @@
       </span>
       <span *ngIf="showBackButton; else prevPc">Back to list</span>
       <ng-template #prevPc>
-        <span>Previous</span>
+        <span>Previous Movie</span>
       </ng-template>
     </button>
 
@@ -55,7 +55,7 @@
         [useContent]="true"
         (onClick)="addToFavorite()"
       >
-        <span *ngIf="!isMovieInList; else unfavorite" class="button-title"
+        <span *ngIf="!isMovieInFavorite; else unfavorite" class="button-title"
           >Add to favorite</span
         >
         <ng-template #unfavorite>
@@ -63,27 +63,35 @@
         </ng-template>
 
         <span
-          *ngIf="!isMovieInList; else unfavoriteIcon"
+          *ngIf="!isMovieInFavorite; else unfavoriteIcon"
           class="material-icons-outlined button-icon"
-          style="font-size: 32px"
+          style="font-size: 48px"
         >
           star_border
         </span>
         <ng-template #unfavoriteIcon>
           <span
             class="material-icons-outlined button-icon"
-            style="font-size: 32px"
+            style="font-size: 48px"
           >
             star
           </span>
         </ng-template>
       </app-button>
       <h1 class="movie-title">{{ movie.original_title }}</h1>
-      <p class="score">Score: {{ movie.vote_average | number : "1.0-1" }}</p>
-      <p class="rating">Rating: {{ movie.adult ? "R" : "PG" }}</p>
-      <p class="release">
-        Release Date: {{ movie.release_date | date : "longDate" }}
+      <p class="score">
+        Score: <br class="line-break" />
+        {{ movie.vote_average | number : "1.0-1" }}
       </p>
+      <p class="rating">
+        Rating: <br class="line-break" />
+        {{ movie.adult ? "R" : "PG" }}
+      </p>
+      <p class="release">
+        Release Date: <br class="line-break" />
+        {{ movie.release_date | date : "longDate" }}
+      </p>
+
       <p *ngIf="movie?.overview" class="movie-description">
         {{ movie.overview }}
       </p>

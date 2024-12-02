@@ -6,6 +6,7 @@
       <app-favorite-item
         [movie]="movie"
         (onRemove)="removeMovie(movie)"
+        (imageClick)="navigateToMovieDetails($event)"
       ></app-favorite-item>
     </div>
   </div>
