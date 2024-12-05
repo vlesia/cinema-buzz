@@ -10,7 +10,6 @@ export class HeaderComponent implements OnInit {
   selectedText: string = 'My Account';
 
   private router = inject(Router);
-
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {

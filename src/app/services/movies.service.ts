@@ -1,5 +1,5 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 
 import { Movie, MoviesResponse } from '../models/movie.model';
@@ -12,7 +12,7 @@ export class MoviesService {
   private API_KEY = 'ebea8cfca72fdff8d2624ad7bbf78e4c';
   movies: Movie[] = [];
 
-  private httpClient = inject(HttpClient);
+  constructor(private httpClient: HttpClient) {}
 
   getMovies(page: number): Observable<Movie[]> {
     return this.httpClient

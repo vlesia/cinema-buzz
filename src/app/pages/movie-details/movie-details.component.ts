@@ -33,7 +33,9 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   get backgroundUrl(): string {
-    return `https://image.tmdb.org/t/p/w780${this.movie?.backdrop_path}`;
+    return this.movie?.backdrop_path
+      ? `https://image.tmdb.org/t/p/w780${this.movie.backdrop_path}`
+      : '';
   }
 
   ngOnInit(): void {
