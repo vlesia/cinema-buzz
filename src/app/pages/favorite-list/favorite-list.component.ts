@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Movie } from '../../models/movie.model';
@@ -13,9 +13,11 @@ import { MoviesContextService } from '../../services/movies-context.service';
 export class FavoriteListComponent implements OnInit {
   movies: Movie[] = [];
 
-  private router = inject(Router);
-  private storageService = inject(StorageService);
-  private moviesContext = inject(MoviesContextService);
+  constructor(
+    private router: Router,
+    private storageService: StorageService,
+    private moviesContext: MoviesContextService
+  ) {}
 
   ngOnInit(): void {
     this.loadMovies();

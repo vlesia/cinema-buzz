@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
@@ -9,8 +9,10 @@ import { NavigationEnd, Router } from '@angular/router';
 export class HeaderComponent implements OnInit {
   selectedText: string = 'My Account';
 
-  private router = inject(Router);
-  private destroyRef = inject(DestroyRef);
+  constructor(
+    private router: Router,
+    private destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     const subscription = this.router.events.subscribe((event) => {

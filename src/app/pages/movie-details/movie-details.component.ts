@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -21,12 +21,14 @@ export class MovieDetailsComponent implements OnInit {
   moviesFavorite: Movie[] = [];
   context = '';
 
-  private activatedRoute = inject(ActivatedRoute);
-  private router = inject(Router);
-  private destroyRef = inject(DestroyRef);
-  private moviesService = inject(MoviesService);
-  private storageService = inject(StorageService);
-  private moviesContext = inject(MoviesContextService);
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private destroyRef: DestroyRef,
+    private moviesService: MoviesService,
+    private storageService: StorageService,
+    private moviesContext: MoviesContextService
+  ) {}
 
   get posterUrl(): string {
     return `https://image.tmdb.org/t/p/w342${this.movie?.poster_path}`;

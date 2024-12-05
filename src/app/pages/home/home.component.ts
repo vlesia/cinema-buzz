@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -18,10 +18,12 @@ export class HomeComponent implements OnInit {
   page: number = 1;
   totalItems: number = 1160;
 
-  private router = inject(Router);
-  private moviesService = inject(MoviesService);
-  private destroyRef = inject(DestroyRef);
-  private moviesContext = inject(MoviesContextService);
+  constructor(
+    private router: Router,
+    private moviesService: MoviesService,
+    private destroyRef: DestroyRef,
+    private moviesContext: MoviesContextService
+  ) {}
 
   ngOnInit(): void {
     this.page = this.moviesContext.getPage();
