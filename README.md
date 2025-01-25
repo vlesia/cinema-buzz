@@ -1,27 +1,88 @@
 # CinemaBuzz
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.10.
+## Overview
 
-## Development server
+Cinema Buzz is a dynamic movie web application built using Angular 18.2.0 while following syntax and modular architecture compatible with Angular versions < 16. The application provides users with an engaging platform to browse movies, view detailed information, and manage their favorites.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Demo
 
-## Code scaffolding
+Check out the [DEMO](https://cinema-buzz-gamma.vercel.app) to see the project in action!
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Features
 
-## Build
+- **Movie List Display**: Browse through a curated list of movies fetched from a server.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- **Detailed Information**: Click on a movie to view detailed information, including a synopsis, release date, and more.
 
-## Running unit tests
+- **Favorites System**: Add movies to your favorites list for easy access.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Technologies Used
 
-## Running end-to-end tests
+- **Angular**: Version 18.2.0 with syntax compatible with Angular versions < 16.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+- **State Management**: RxJS for handling asynchronous operations
 
-## Further help
+- **TypeScript**: Ensures type safety and scalability.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **SCSS**: For responsive and maintainable styling.
+
+
+## Folder Structure
+
+The project follows a standard folder structure for better organization:
+
+```
+
+src
+├── app                        # Root application folder
+│   ├── components             # Reusable components
+│   ├── models                 # Data interfaces and types
+│   ├── pages                  # Page-level components for routing
+│   ├── services               # Services for API calls and shared logic
+│   ├── share                  # Shared modules, directives, and pipes
+│   ├── app-routing.module.ts  # App routing configuration
+│   ├── app.component.html     # Root component HTML
+│   ├── app.component.scss     # Root component styles
+│   ├── app.component.ts       # Root component logic
+│   ├── app.module.ts          # Root application module
+├── styles                     # Global SCSS styles
+├── index.html                 # Entry point HTML file
+├── main.ts                    # Main entry point for bootstrapping
+├── styles.scss                # Global SCSS file
+
+```
+
+## Getting Started
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/vlesia/cinema-buzz.git
+
+   ```
+
+2. **Navigate to the Project Directory**:
+
+   ```bash
+   cd cinema-buzz
+
+   ```
+
+3. **Install Dependencies**:
+
+   ```bash
+   npm install
+
+   ```
+
+4. **Start the development server**:
+
+   ```bash
+   ng serve
+   ```
+
+5. **Open your browser and navigate to**:
+
+   ```bash
+   http://localhost:4200
+   ```
